@@ -3,6 +3,10 @@ package com.github.erintl.grpc.greeting.client;
 import com.proto.greet.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.stub.StreamObserver;
+
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 public class GreetingClient
 {
@@ -10,27 +14,42 @@ public class GreetingClient
     {
         System.out.println("I'm a gRPC client");
 
+        GreetingClient client = new GreetingClient();
+        client.run();
+    }
+
+    public void run()
+    {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext()
                 .build();
-        GreetServiceGrpc.GreetServiceBlockingStub greetClient = GreetServiceGrpc.newBlockingStub(channel);
+
+        // unaryGreet(channel);
+//        doServerStreaming(channel);
+        doClientStreaming(channel);
+
+        System.out.println("Shutting down channel");
+        channel.shutdown();
+    }
+
+    private void doServerStreaming(ManagedChannel channel)
+    {
+        GreetServiceGrpc.GreetServiceBlockingStub stub = GreetServiceGrpc.newBlockingStub(channel);
 
         // Server streaming
         GreetManyTimesRequest greetManyTimesRequest = GreetManyTimesRequest.newBuilder()
                 .setGreeting(Greeting.newBuilder().setFirstName("Joe").setLastName("Blow").build())
                 .build();
         // Stream responses in a blocking manner.
-        greetClient.greetManyTimes(greetManyTimesRequest)
+        stub.greetManyTimes(greetManyTimesRequest)
                 .forEachRemaining(greetManyTimesResponse -> {
                     System.out.println(greetManyTimesResponse.getResult());
                 });
-
-        System.out.println("Shutting down channel");
-        channel.shutdown();
     }
 
-    private static void unaryGreet(GreetServiceGrpc.GreetServiceBlockingStub greetClient)
+    private void doUnary(ManagedChannel channel)
     {
+        GreetServiceGrpc.GreetServiceBlockingStub stub = GreetServiceGrpc.newBlockingStub(channel);
 
         Greeting greeting = Greeting.newBuilder()
                 .setFirstName("Joe")
@@ -40,7 +59,66 @@ public class GreetingClient
                 .setGreeting(greeting)
                 .build();
 
-        GreetResponse greetResponse = greetClient.greet(greetRequest);
+        GreetResponse greetResponse = stub.greet(greetRequest);
         System.out.println(greetResponse.getResult());
+    }
+
+    private void doClientStreaming(ManagedChannel channel)
+    {
+        GreetServiceGrpc.GreetServiceStub stub = GreetServiceGrpc.newStub(channel);
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<LongGreetRequest> requestObserver =  stub.longGreet(new StreamObserver<>()
+        {
+            @Override
+            public void onNext(LongGreetResponse value)
+            {
+                // Get a response from the server. Called only once
+                System.out.println("Received a response from the server");
+                System.out.println(value.getResult());
+            }
+
+            @Override
+            public void onError(Throwable t)
+            {
+                // The server sends an error
+            }
+
+            @Override
+            public void onCompleted()
+            {
+                // The server is done sending data. Call immediately following onNext()
+                System.out.println("Server has completed sending data");
+                latch.countDown();
+            }
+        });
+
+        requestObserver.onNext(LongGreetRequest.newBuilder()
+                .setGreeting(Greeting.newBuilder()
+                        .setFirstName("Joe")
+                        .setLastName("Blow").build())
+                .build());
+
+        requestObserver.onNext(LongGreetRequest.newBuilder()
+                .setGreeting(Greeting.newBuilder()
+                        .setFirstName("Bill")
+                        .setLastName("Toms").build())
+                .build());
+
+        requestObserver.onNext(LongGreetRequest.newBuilder()
+                .setGreeting(Greeting.newBuilder()
+                        .setFirstName("Marc")
+                        .setLastName("Johnson").build())
+                .build());
+
+        requestObserver.onCompleted();
+
+        try
+        {
+            latch.await(3, TimeUnit.SECONDS);
+        } catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
     }
 }

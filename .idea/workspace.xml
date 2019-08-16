@@ -3,7 +3,11 @@
   <component name="ChangeListManager">
     <list default="true" id="42d9327c-a150-4b1a-8320-6807fcbd3411" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/calculator/client/CalculatorClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/calculator/client/CalculatorClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/calculator/server/CalculatorServerImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/calculator/server/CalculatorServerImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/greeting/client/GreetingClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/greeting/client/GreetingClient.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/greeting/server/GreetServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/github/erintl/grpc/greeting/server/GreetServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/proto/calculator/calculator.proto" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/proto/calculator/calculator.proto" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -89,7 +93,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Gradle.grpc-course [generateProto]">
+  <component name="RunManager" selected="Application.CalculatorClient">
     <configuration name="CalculatorClient" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="com.github.erintl.grpc.calculator.client.CalculatorClient" />
       <module name="grpc-course.main" />
@@ -211,7 +215,7 @@
       <workItem from="1565808727303" duration="847000" />
       <workItem from="1565809846339" duration="603000" />
       <workItem from="1565810473372" duration="4471000" />
-      <workItem from="1565873388207" duration="10175000" />
+      <workItem from="1565873388207" duration="17889000" />
     </task>
     <servers />
   </component>
