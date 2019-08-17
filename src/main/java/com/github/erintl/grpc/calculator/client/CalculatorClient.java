@@ -3,6 +3,7 @@ package com.github.erintl.grpc.calculator.client;
 import com.proto.calculator.*;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -37,7 +38,8 @@ public class CalculatorClient
                 .usePlaintext()
                 .build();
 
-        findMaximum(channel);
+//        findMaximum(channel);
+        squareRoot(channel);
 
         channel.shutdown();
     }
@@ -95,6 +97,24 @@ public class CalculatorClient
         SumResponse response = calculatorClient.sum(sumRequest);
 
         System.out.println(String.format("%d + %d = %d", sumRequest.getFirstNumber(), sumRequest.getSecondNumber(), response.getSumResult()));
+    }
+
+    private void squareRoot(ManagedChannel channel) {
+        CalculatorServiceGrpc.CalculatorServiceBlockingStub calculatorClient = CalculatorServiceGrpc.newBlockingStub(channel);
+
+        int number = -1;
+
+        try {
+            SquareRootResponse response = calculatorClient.squareRoot(SquareRootRequest.newBuilder()
+                    .setNumber(number)
+                    .build());
+            System.out.println(String.format("The square root of %d is %f", number, response.getRoot()));
+        }
+        catch (StatusRuntimeException e) {
+            System.out.println("Got an exception for square root !");
+            e.printStackTrace();
+        }
+
     }
 
     private void average(ManagedChannel channel)

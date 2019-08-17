@@ -1,8 +1,7 @@
 package com.github.erintl.grpc.greeting.client;
 
 import com.proto.greet.*;
-import io.grpc.ManagedChannel;
-import io.grpc.ManagedChannelBuilder;
+import io.grpc.*;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -28,7 +27,8 @@ public class GreetingClient
 //        doUnary(channel);
 //        doServerStreaming(channel);
 //        doClientStreaming(channel);
-        doBiDiStreamingCall(channel);
+//        doBiDiStreamingCall(channel);
+        doUnaryWithDeadline(channel);
 
         System.out.println("Shutting down channel");
         channel.shutdown();
@@ -63,6 +63,42 @@ public class GreetingClient
 
         GreetResponse greetResponse = stub.greet(greetRequest);
         System.out.println(greetResponse.getResult());
+    }
+
+    private void doUnaryWithDeadline(ManagedChannel channel) {
+        GreetServiceGrpc.GreetServiceBlockingStub stub = GreetServiceGrpc.newBlockingStub(channel);
+
+        // first call (3000 ms deadline)
+        try {
+            System.out.println("Sending a request with a deadline of 3000 ms");
+            GreetWithDeadlineResponse response = stub.withDeadline(Deadline.after(3000, TimeUnit.MILLISECONDS)).greetWithDeadline(
+                    GreetWithDeadlineRequest.newBuilder().setGreeting(Greeting.newBuilder()
+                            .setFirstName("Joe").setLastName("Blow").build())
+                            .build());
+            System.out.println(response.getResult());
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus() == Status.DEADLINE_EXCEEDED) {
+                System.out.println("Deadline has been exceeded, we don't want the response");
+            } else {
+                e.printStackTrace();
+            }
+        }
+
+        // first call (100 ms deadline)
+        try {
+            System.out.println("Sending a request with a deadline of 100 ms");
+            GreetWithDeadlineResponse response = stub.withDeadline(Deadline.after(100, TimeUnit.MILLISECONDS)).greetWithDeadline(
+                    GreetWithDeadlineRequest.newBuilder().setGreeting(Greeting.newBuilder()
+                            .setFirstName("Joe").setLastName("Blow").build())
+                            .build());
+            System.out.println(response.getResult());
+        } catch (StatusRuntimeException e) {
+            if (e.getStatus() == Status.DEADLINE_EXCEEDED) {
+                System.out.println("Deadline has been exceeded, we don't want the response");
+            } else {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void doClientStreaming(ManagedChannel channel)
