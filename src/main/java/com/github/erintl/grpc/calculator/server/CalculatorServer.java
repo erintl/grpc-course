@@ -1,6 +1,5 @@
 package com.github.erintl.grpc.calculator.server;
 
-import com.github.erintl.grpc.greeting.server.GreetServiceImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 

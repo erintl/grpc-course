@@ -5,6 +5,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
@@ -36,9 +37,50 @@ public class CalculatorClient
                 .usePlaintext()
                 .build();
 
-        average(channel);
+        findMaximum(channel);
 
         channel.shutdown();
+    }
+
+    private void findMaximum(ManagedChannel channel) {
+        CalculatorServiceGrpc.CalculatorServiceStub asyncClient = CalculatorServiceGrpc.newStub(channel);
+        CountDownLatch latch = new CountDownLatch(1);
+
+        StreamObserver<FindMaximumRequest> requestObserver = asyncClient.findMaximum(new StreamObserver<>() {
+            @Override
+            public void onNext(FindMaximumResponse value) {
+                System.out.println("Got new maximum from Server: " + value.getMaximum());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                latch.countDown();
+            }
+
+            @Override
+            public void onCompleted() {
+                System.out.println("Server is done sending messages");
+            }
+        });
+
+        Arrays.asList(3, 5, 17, 9, 8, 30, 12).forEach(
+                number -> {
+                    System.out.println("Sending number:" + number);
+                    requestObserver.onNext(FindMaximumRequest.newBuilder()
+                            .setNumber(number)
+                            .build());
+                }
+        );
+
+        requestObserver.onCompleted();
+        try
+        {
+            latch.await(3, TimeUnit.SECONDS);
+        }
+        catch (InterruptedException e)
+        {
+            e.printStackTrace();
+        }
     }
 
     private void sum(ManagedChannel channel)
