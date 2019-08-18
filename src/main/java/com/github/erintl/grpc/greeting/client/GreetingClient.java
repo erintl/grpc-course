@@ -2,36 +2,44 @@ package com.github.erintl.grpc.greeting.client;
 
 import com.proto.greet.*;
 import io.grpc.*;
+import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import javax.net.ssl.SSLException;
+import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class GreetingClient
 {
-    public static void main(String[] args)
-    {
+    public static void main(String[] args) throws SSLException {
         System.out.println("I'm a gRPC client");
 
         GreetingClient client = new GreetingClient();
         client.run();
     }
 
-    public void run()
-    {
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
-                .usePlaintext()
+    public void run() throws SSLException {
+        // Plaintext channel
+//        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
+//                .usePlaintext()
+//                .build();
+
+        // Secure channel
+        ManagedChannel secureChannel = NettyChannelBuilder.forAddress("localhost", 50051)
+                .sslContext(GrpcSslContexts.forClient().trustManager(new File("ssl/ca.crt")).build())
                 .build();
 
-//        doUnary(channel);
+        doUnary(secureChannel);
 //        doServerStreaming(channel);
 //        doClientStreaming(channel);
 //        doBiDiStreamingCall(channel);
-        doUnaryWithDeadline(channel);
+//        doUnaryWithDeadline(channel);
 
         System.out.println("Shutting down channel");
-        channel.shutdown();
+        secureChannel.shutdown();
     }
 
     private void doServerStreaming(ManagedChannel channel)

@@ -3,6 +3,7 @@ package com.github.erintl.grpc.greeting.server;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
+import java.io.File;
 import java.io.IOException;
 
 public class GreetingServer
@@ -11,8 +12,18 @@ public class GreetingServer
     {
         System.out.println("Hello gRPC");
 
+        // Plaintext server
+//        Server server = ServerBuilder.forPort(50051)
+//                .addService(new GreetServiceImpl())
+//                .build();
+
+        // Secure server
         Server server = ServerBuilder.forPort(50051)
                 .addService(new GreetServiceImpl())
+                .useTransportSecurity(
+                        new File("ssl/server.crt"),
+                        new File("ssl/server.pem")
+                )
                 .build();
 
         server.start();
