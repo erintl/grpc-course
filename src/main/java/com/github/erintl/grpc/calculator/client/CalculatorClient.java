@@ -38,7 +38,7 @@ public class CalculatorClient
                 .usePlaintext()
                 .build();
 
-//        findMaximum(channel);
+        // sum(channel);
         squareRoot(channel);
 
         channel.shutdown();

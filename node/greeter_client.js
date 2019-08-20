@@ -16,7 +16,7 @@
  *
  */
 
-var PROTO_PATH = __dirname + '/../src/main/proto/greet/greet.proto';
+var PROTO_PATH = __dirname + '/../src/main/proto/calculator/calculator.proto';
 
 var grpc = require('grpc');
 var protoLoader = require('@grpc/proto-loader');
@@ -28,14 +28,14 @@ var packageDefinition = protoLoader.loadSync(
      defaults: true,
      oneofs: true
     });
-var greet_proto = grpc.loadPackageDefinition(packageDefinition).greet;
+var calculator_proto = grpc.loadPackageDefinition(packageDefinition).calculator;
 
 function main() {
-  var client = new greet_proto.GreetService('localhost:50051',
+  var client = new calculator_proto.CalculatorService('localhost:50052',
                                        grpc.credentials.createInsecure());
-  var user = { first_name: 'John', last_name: 'Smith'};
-  client.greet({greeting: user}, function(err, response) {
-    console.log('Greeting:', response.result);
+
+  client.sum({first_number: 10, second_number: 15}, function(err, response) {
+    console.log('Sum:', response.sum_result);
   });
 }
 

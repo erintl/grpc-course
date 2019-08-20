@@ -32,11 +32,11 @@ public class GreetingClient
                 .sslContext(GrpcSslContexts.forClient().trustManager(new File("ssl/ca.crt")).build())
                 .build();
 
-        doUnary(secureChannel);
+//        doUnary(secureChannel);
 //        doServerStreaming(channel);
 //        doClientStreaming(channel);
 //        doBiDiStreamingCall(channel);
-//        doUnaryWithDeadline(channel);
+        doUnaryWithDeadline(secureChannel);
 
         System.out.println("Shutting down channel");
         secureChannel.shutdown();
