@@ -1,2 +1,2 @@
-# grpc-course
+= grpc-course
 gRPC course sample project
